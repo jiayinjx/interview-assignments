@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 public class DailyUrlHitCount {
 
     public static void main(String []args){
+
         if(args.length > 0) {
             File input = new File(args[0]);
             Map<String, Map<String, Integer>> dateMap = new TreeMap<>();
@@ -53,11 +54,34 @@ public class DailyUrlHitCount {
 
         for(Map.Entry<String, Map<String, Integer>> date : dateMap.entrySet()) {
             System.out.println(date.getKey() + " GMT");
-            Iterator<Map.Entry<String, Integer>> urlsHit = date.getValue().entrySet().iterator();
-            while(urlsHit.hasNext()) {
-                Map.Entry<String, Integer> entry = urlsHit.next();
+
+            Map<String, Integer> urlsHit = sortUrlsHit(date.getValue());
+            Iterator<Map.Entry<String, Integer>> set = urlsHit.entrySet().iterator();
+
+            while(set.hasNext()) {
+                Map.Entry<String, Integer> entry = set.next();
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
         }
+    }
+
+    public static Map<String, Integer> sortUrlsHit(Map<String, Integer> urlsHit) {
+
+        List<Map.Entry<String, Integer> > hitsList =
+                new LinkedList<Map.Entry<String, Integer>>(urlsHit.entrySet());
+
+        Collections.sort(hitsList, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2)
+            {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> h : hitsList) {
+            map.put(h.getKey(), h.getValue());
+        }
+        return map;
     }
 }
